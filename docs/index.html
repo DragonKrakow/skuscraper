@@ -20,7 +20,7 @@
 
     body {
       margin: 0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -57,6 +57,17 @@
       display: grid;
       gap: .65rem;
       grid-template-columns: 1fr 170px;
+    }
+
+    .market-group {
+      display: grid;
+      gap: .35rem;
+    }
+
+    .market-group label {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--muted);
     }
 
     input, select, button {
@@ -129,10 +140,13 @@
       <label for="query">EAN or product name</label>
       <div class="field-row">
         <input id="query" name="query" type="text" placeholder="e.g. 8000500310427 or Nutella" required />
-        <select id="market" name="market" aria-label="Market">
-          <option value="IT">Italy</option>
-          <option value="PL">Poland</option>
-        </select>
+        <div class="market-group">
+          <label for="market">Market</label>
+          <select id="market" name="market">
+            <option value="IT">Italy</option>
+            <option value="PL">Poland</option>
+          </select>
+        </div>
       </div>
       <button type="submit">Search</button>
       <p class="hint">Tip: enter an 8 or 13-digit EAN code, or any text for product name search.</p>
