@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SKU Scraper (IT + PL)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; color: #1a1a1a; }
+    .card { max-width: 900px; margin: 0 auto; padding: 1.5rem; border: 1px solid #ddd; border-radius: 10px; }
+    h1 { margin-top: 0; }
+    code, pre { background: #f6f8fa; padding: .2rem .4rem; border-radius: 6px; }
+    pre { padding: 1rem; overflow: auto; }
+    a { color: #0969da; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>EAN Code Data Scraper</h1>
+    <p>This project scrapes and aggregates product data by EAN code for <strong>Italy (IT)</strong> and <strong>Poland (PL)</strong> using free/open sources.</p>
+    <h2>Unified Output Schema</h2>
+    <pre>{
+  "ean": "8000500310427",
+  "product_name": "Example Product",
+  "brand": "Example Brand",
+  "category": "example-category",
+  "price": 12.99,
+  "currency": "EUR",
+  "source": "open_food_facts,trovaprezzi",
+  "market": "IT",
+  "scraped_at": "2026-04-15T17:00:00+00:00"
+}</pre>
+    <h2>CLI Examples</h2>
+    <pre>python italy/scraper_it.py --ean 8000500310427
+python poland/scraper_pl.py --batch /absolute/path/eans.txt --csv data/results_pl.csv</pre>
+    <p>For full setup and legal/rate-limit notes, see the <a href="../README.md">README</a>.</p>
+  </div>
+</body>
+</html>
