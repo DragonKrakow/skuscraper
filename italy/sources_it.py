@@ -4,11 +4,14 @@ import os
 import random
 import re
 import time
+import logging
 from typing import Any, Dict, Optional
 
 import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
+
+logger = logging.getLogger(__name__)
 
 
 def _bool_env(name: str, default: bool) -> bool:
@@ -50,7 +53,8 @@ def scrape_trovaprezzi(ean: str, timeout: int = 10) -> Optional[Dict[str, Any]]:
             timeout=timeout,
         )
         response.raise_for_status()
-    except requests.RequestException:
+    except requests.RequestException as exc:
+        logger.warning("Trovaprezzi request failed for EAN %s: %s", ean, exc)
         return None
 
     soup = BeautifulSoup(response.text, "lxml")
@@ -75,7 +79,7 @@ def scrape_amazon_it_placeholder(ean: str) -> Optional[Dict[str, Any]]:
     if not _bool_env("ENABLE_AMAZON_IT", False):
         return None
 
-    print(
+    logger.warning(
         "Amazon.it scraping is disabled by default and may violate Terms of Service. "
         "Enable only after legal/ToS review and robots.txt checks."
     )

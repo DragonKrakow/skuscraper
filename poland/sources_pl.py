@@ -4,11 +4,14 @@ import os
 import random
 import re
 import time
+import logging
 from typing import Any, Dict, Optional
 
 import requests
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
+
+logger = logging.getLogger(__name__)
 
 
 def _bool_env(name: str, default: bool) -> bool:
@@ -30,7 +33,7 @@ def _delay() -> None:
 def _parse_price(value: str) -> Optional[float]:
     if not value:
         return None
-    cleaned = re.sub(r"[^\d,\.]", "", value).replace(" ", "")
+    cleaned = re.sub(r"[^\d,\.]", "", value)
     cleaned = cleaned.replace(",", ".")
     try:
         return float(cleaned)
@@ -68,7 +71,8 @@ def allegro_search_scaffold(ean: str, timeout: int = 10) -> Optional[Dict[str, A
         )
         response.raise_for_status()
         payload = response.json()
-    except (requests.RequestException, ValueError):
+    except (requests.RequestException, ValueError) as exc:
+        logger.warning("Allegro scaffold request failed for EAN %s: %s", ean, exc)
         return None
 
     items = ((payload.get("items") or {}).get("regular") or [])
@@ -101,7 +105,8 @@ def scrape_ceneo(ean: str, timeout: int = 10) -> Optional[Dict[str, Any]]:
             timeout=timeout,
         )
         response.raise_for_status()
-    except requests.RequestException:
+    except requests.RequestException as exc:
+        logger.warning("Ceneo request failed for EAN %s: %s", ean, exc)
         return None
 
     soup = BeautifulSoup(response.text, "lxml")

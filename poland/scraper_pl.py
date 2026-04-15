@@ -55,7 +55,7 @@ def scrape_ean_pl(ean: str) -> Dict[str, object]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="EAN scraper for Poland market")
-    group = parser.add_mutually_exclusive_group(required=True)
+    group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument("--ean", help="Single EAN code")
     group.add_argument("--batch", help="Path to batch file (one EAN per line)")
     parser.add_argument("--db", default="data/results.db", help="SQLite output path")
@@ -69,6 +69,11 @@ def main() -> None:
 
     if args.allegro_help:
         print(allegro_device_flow_instructions())
+        if not args.ean and not args.batch:
+            return
+
+    if not args.ean and not args.batch:
+        parser.error("one of --ean or --batch is required unless --allegro-help is used")
 
     eans = _read_eans(args.ean, args.batch)
     records = [scrape_ean_pl(ean) for ean in eans]
