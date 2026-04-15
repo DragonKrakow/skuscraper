@@ -5,34 +5,217 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SKU Scraper (IT + PL)</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 2rem; color: #1a1a1a; }
-    .card { max-width: 900px; margin: 0 auto; padding: 1.5rem; border: 1px solid #ddd; border-radius: 10px; }
-    h1 { margin-top: 0; }
-    code, pre { background: #f6f8fa; padding: .2rem .4rem; border-radius: 6px; }
-    pre { padding: 1rem; overflow: auto; }
-    a { color: #0969da; }
+    :root {
+      color-scheme: light;
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #1c2434;
+      --muted: #5a667d;
+      --primary: #285fe6;
+      --primary-dark: #1f4fc3;
+      --border: #d8deea;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .card {
+      width: min(760px, 100%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 30px rgba(15, 36, 84, 0.08);
+    }
+
+    h1 { margin: 0 0 .5rem; font-size: 1.7rem; }
+    p { margin: 0; color: var(--muted); }
+
+    form {
+      margin-top: 1.2rem;
+      display: grid;
+      gap: .8rem;
+    }
+
+    label {
+      font-weight: 600;
+      font-size: .95rem;
+    }
+
+    .field-row {
+      display: grid;
+      gap: .65rem;
+      grid-template-columns: 1fr 170px;
+    }
+
+    input, select, button {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: .75rem .85rem;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid color-mix(in srgb, var(--primary) 35%, #fff);
+      border-color: var(--primary);
+    }
+
+    button {
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover { background: var(--primary-dark); }
+
+    .hint {
+      margin-top: .35rem;
+      font-size: .88rem;
+      color: var(--muted);
+    }
+
+    .result {
+      margin-top: 1.2rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      background: #fafcff;
+    }
+
+    .result h2 {
+      margin: 0 0 .6rem;
+      font-size: 1.05rem;
+    }
+
+    code {
+      display: block;
+      background: #f0f3fa;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .7rem;
+      overflow-x: auto;
+      font-size: .9rem;
+    }
+
+    ul { margin: .7rem 0 0; padding-left: 1.1rem; }
+    li + li { margin-top: .4rem; }
+    a { color: var(--primary-dark); }
+
+    @media (max-width: 680px) {
+      .field-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>EAN Code Data Scraper</h1>
-    <p>This project scrapes and aggregates product data by EAN code for <strong>Italy (IT)</strong> and <strong>Poland (PL)</strong> using free/open sources.</p>
-    <h2>Unified Output Schema</h2>
-    <pre>{
-  "ean": "8000500310427",
-  "product_name": "Example Product",
-  "brand": "Example Brand",
-  "category": "example-category",
-  "price": 12.99,
-  "currency": "EUR",
-  "source": "open_food_facts,trovaprezzi",
-  "market": "IT",
-  "scraped_at": "2026-04-15T17:00:00+00:00"
-}</pre>
-    <h2>CLI Examples</h2>
-    <pre>python italy/scraper_it.py --ean 8000500310427
-python poland/scraper_pl.py --batch /absolute/path/eans.txt --csv data/results_pl.csv</pre>
-    <p>For full setup and legal/rate-limit notes, see the <a href="../README.md">README</a>.</p>
-  </div>
+  <main class="card">
+    <h1>Product Search (Italy + Poland)</h1>
+    <p>Use one field for either an EAN code or a product name, then choose market: Poland or Italy.</p>
+
+    <form id="searchForm">
+      <label for="query">EAN or product name</label>
+      <div class="field-row">
+        <input id="query" name="query" type="text" placeholder="e.g. 8000500310427 or Nutella" required />
+        <select id="market" name="market" aria-label="Market">
+          <option value="IT">Italy</option>
+          <option value="PL">Poland</option>
+        </select>
+      </div>
+      <button type="submit">Search</button>
+      <p class="hint">Tip: EAN is treated as 8-14 digits.</p>
+    </form>
+
+    <section id="result" class="result" hidden>
+      <h2 id="resultTitle"></h2>
+      <code id="cliCommand"></code>
+      <ul id="links"></ul>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById('searchForm');
+    const queryInput = document.getElementById('query');
+    const marketInput = document.getElementById('market');
+    const result = document.getElementById('result');
+    const resultTitle = document.getElementById('resultTitle');
+    const cliCommand = document.getElementById('cliCommand');
+    const links = document.getElementById('links');
+
+    const isEan = (value) => /^\d{8,14}$/.test(value);
+
+    const encoded = (value) => encodeURIComponent(value.trim());
+
+    const marketLabel = {
+      IT: 'Italy',
+      PL: 'Poland'
+    };
+
+    const getQuickLinks = (query, market, eanMode) => {
+      const q = encoded(query);
+      const offQuery = eanMode
+        ? `https://world.openfoodfacts.org/product/${q}`
+        : `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${q}&search_simple=1&action=process`;
+
+      if (market === 'IT') {
+        return [
+          { label: 'Open Food Facts', url: offQuery },
+          { label: 'Trovaprezzi', url: `https://www.trovaprezzi.it/categoria.aspx?libera=${q}` }
+        ];
+      }
+
+      return [
+        { label: 'Open Food Facts', url: offQuery },
+        { label: 'Ceneo', url: `https://www.ceneo.pl/;szukaj-${q}` },
+        { label: 'Allegro', url: `https://allegro.pl/listing?string=${q}` }
+      ];
+    };
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const query = queryInput.value.trim();
+      const market = marketInput.value;
+      const eanMode = isEan(query);
+
+      if (!query) {
+        result.hidden = true;
+        return;
+      }
+
+      resultTitle.textContent = `${eanMode ? 'EAN' : 'Product name'} search for ${marketLabel[market]}`;
+      cliCommand.textContent = eanMode
+        ? (market === 'IT'
+          ? `python italy/scraper_it.py --ean ${query}`
+          : `python poland/scraper_pl.py --ean ${query}`)
+        : 'CLI mode accepts EAN codes. Search by product name first, then scrape with the matched EAN.';
+
+      links.innerHTML = '';
+      for (const item of getQuickLinks(query, market, eanMode)) {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = item.url;
+        a.target = '_blank';
+        a.rel = 'noreferrer noopener';
+        a.textContent = item.label;
+        li.appendChild(a);
+        links.appendChild(li);
+      }
+
+      result.hidden = false;
+    });
+  </script>
 </body>
 </html>
