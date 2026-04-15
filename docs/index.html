@@ -135,7 +135,7 @@
         </select>
       </div>
       <button type="submit">Search</button>
-      <p class="hint">Tip: enter 8, 13, or 14 digits for EAN, or any text for product name search.</p>
+      <p class="hint">Tip: enter an 8, 13, or 14-digit barcode number, or any text for product name search.</p>
     </form>
 
     <section id="result" class="result" hidden>
@@ -154,7 +154,7 @@
     const cliCommand = document.getElementById('cliCommand');
     const links = document.getElementById('links');
 
-    const hasEanLikeFormat = (value) => /^(?:\d{8}|\d{13}|\d{14})$/.test(value);
+    const matchesEanPattern = (value) => /^(?:\d{8}|\d{13}|\d{14})$/.test(value);
 
     const encodeQuery = (value) => encodeURIComponent(value.trim());
 
@@ -188,7 +188,7 @@
 
       const query = queryInput.value.trim();
       const market = marketInput.value;
-      const eanMode = hasEanLikeFormat(query);
+      const eanMode = matchesEanPattern(query);
 
       resultTitle.textContent = `${eanMode ? 'EAN' : 'Product name'} search for ${marketLabel[market]}`;
       cliCommand.textContent = eanMode
