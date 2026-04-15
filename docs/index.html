@@ -197,7 +197,7 @@
           : `python poland/scraper_pl.py --ean ${query}`)
         : 'CLI mode accepts EAN codes. Search by product name first, then scrape with the matched EAN.';
 
-      links.replaceChildren();
+      links.innerHTML = '';
       for (const item of getQuickLinks(query, market, eanMode)) {
         const li = document.createElement('li');
         const a = document.createElement('a');
