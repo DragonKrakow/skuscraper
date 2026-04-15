@@ -68,7 +68,7 @@
     }
 
     input:focus, select:focus {
-      outline: 2px solid color-mix(in srgb, var(--primary) 35%, #fff);
+      outline: 2px solid rgba(40, 95, 230, 0.35);
       border-color: var(--primary);
     }
 
@@ -135,7 +135,7 @@
         </select>
       </div>
       <button type="submit">Search</button>
-      <p class="hint">Tip: EAN is treated as 8-14 digits.</p>
+      <p class="hint">Tip: enter 8-14 digits for EAN, or any text for product name search.</p>
     </form>
 
     <section id="result" class="result" hidden>
@@ -154,7 +154,7 @@
     const cliCommand = document.getElementById('cliCommand');
     const links = document.getElementById('links');
 
-    const isEAN = (value) => /^\d{8,14}$/.test(value);
+    const isEANFormat = (value) => /^\d{8,14}$/.test(value);
 
     const encodeQuery = (value) => encodeURIComponent(value.trim());
 
@@ -188,12 +188,7 @@
 
       const query = queryInput.value.trim();
       const market = marketInput.value;
-      const eanMode = isEAN(query);
-
-      if (!query) {
-        result.hidden = true;
-        return;
-      }
+      const eanMode = isEANFormat(query);
 
       resultTitle.textContent = `${eanMode ? 'EAN' : 'Product name'} search for ${marketLabel[market]}`;
       cliCommand.textContent = eanMode
