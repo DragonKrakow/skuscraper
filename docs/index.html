@@ -154,9 +154,9 @@
     const cliCommand = document.getElementById('cliCommand');
     const links = document.getElementById('links');
 
-    const isEan = (value) => /^\d{8,14}$/.test(value);
+    const isEAN = (value) => /^\d{8,14}$/.test(value);
 
-    const encoded = (value) => encodeURIComponent(value.trim());
+    const encodeQuery = (value) => encodeURIComponent(value.trim());
 
     const marketLabel = {
       IT: 'Italy',
@@ -164,7 +164,7 @@
     };
 
     const getQuickLinks = (query, market, eanMode) => {
-      const q = encoded(query);
+      const q = encodeQuery(query);
       const offQuery = eanMode
         ? `https://world.openfoodfacts.org/product/${q}`
         : `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${q}&search_simple=1&action=process`;
@@ -188,7 +188,7 @@
 
       const query = queryInput.value.trim();
       const market = marketInput.value;
-      const eanMode = isEan(query);
+      const eanMode = isEAN(query);
 
       if (!query) {
         result.hidden = true;
