@@ -154,7 +154,7 @@
     const cliCommand = document.getElementById('cliCommand');
     const links = document.getElementById('links');
 
-    const hasValidEANDigitCount = (value) => /^(?:\d{8}|\d{13}|\d{14})$/.test(value);
+    const hasEANLikeFormat = (value) => /^(?:\d{8}|\d{13}|\d{14})$/.test(value);
 
     const encodeQuery = (value) => encodeURIComponent(value.trim());
 
@@ -188,7 +188,7 @@
 
       const query = queryInput.value.trim();
       const market = marketInput.value;
-      const eanMode = hasValidEANDigitCount(query);
+      const eanMode = hasEANLikeFormat(query);
 
       resultTitle.textContent = `${eanMode ? 'EAN' : 'Product name'} search for ${marketLabel[market]}`;
       cliCommand.textContent = eanMode
@@ -203,7 +203,7 @@
         const a = document.createElement('a');
         a.href = item.url;
         a.target = '_blank';
-        a.rel = 'noopener';
+        a.rel = 'noopener noreferrer';
         a.textContent = item.label;
         li.appendChild(a);
         links.appendChild(li);
