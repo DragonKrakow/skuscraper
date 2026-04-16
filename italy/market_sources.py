@@ -121,7 +121,7 @@ class KeywordSearchSource:
                 if attempt == attempts - 1:
                     logger.warning("%s request failed (%s): %s", self.source_name, url, exc)
                     return None
-                delay = self.config.backoff_seconds * (2**attempt) + random.uniform(0.0, 0.2)
+                delay = self.config.backoff_seconds * (2 ** (attempt + 1)) + random.uniform(0.0, 0.2)
                 time.sleep(delay)
         return None
 
@@ -364,7 +364,7 @@ def search_market_products(
 
         products = source.search(
             query=query,
-            search_url=amazon_search_url if source_name == "amazon_it" else None,
+            search_url=amazon_search_url,
             sort_by=sort_by,
             limit=limit,
         )

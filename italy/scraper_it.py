@@ -126,6 +126,8 @@ def main() -> None:
     )
     parser.add_argument("--limit", type=int, default=10, help="Max number of product candidates")
     args = parser.parse_args()
+    if args.limit < 1:
+        parser.error("--limit must be >= 1")
 
     if args.query or args.search_url:
         sources = [s.strip() for s in args.sources.split(",") if s.strip()]
@@ -135,7 +137,7 @@ def main() -> None:
             source_names=sources,
             strategy=args.strategy,
             sort_by=args.sort,
-            limit=max(1, args.limit),
+            limit=args.limit,
         )
     else:
         eans = _read_eans(args.ean, args.batch)

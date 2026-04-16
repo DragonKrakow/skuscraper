@@ -43,8 +43,9 @@ python italy/scraper_it.py --query "crema anticellulite" --sources amazon_it,eba
 
 Manual Amazon link mode (Italy, provided search URL):
 ```bash
-python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=crema+anticellulite" --sources amazon_it,ebay_it --strategy fallback
+python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=crema+anticellulite" --sources amazon_it --strategy fallback
 ```
+`--search-url` is consumed by `amazon_it`; if you also include `ebay_it` with no `--query`, eBay will return no candidates.
 
 Single EAN (Poland):
 ```bash
@@ -83,25 +84,25 @@ Environment variables (see `config.example.env`):
 
 ## Example SKU keyword runs (Amazon.it links)
 - SKU001 `Crema Anticellulite Intensiva 250ml`:
-  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=crema+anticellulite" --sources amazon_it,ebay_it`
+  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=crema+anticellulite" --sources amazon_it`
 - SKU002 `Gel Drenante Rimodellante Corpo 200ml`:
-  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=gel+drenante+corpo" --sources amazon_it,ebay_it`
+  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=gel+drenante+corpo" --sources amazon_it`
 - SKU003 `Olio Corpo Anticellulite Naturale 100ml`:
-  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=olio+anticellulite" --sources amazon_it,ebay_it`
+  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=olio+anticellulite" --sources amazon_it`
 - SKU004 `Crema Rassodante Corpo Effetto Lift 200ml`:
-  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=crema+rassodante+corpo" --sources amazon_it,ebay_it`
+  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=crema+rassodante+corpo" --sources amazon_it`
 - SKU005 `Trattamento Snellente Notturno 150ml`:
-  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=crema+snellente+notte" --sources amazon_it,ebay_it`
+  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=crema+snellente+notte" --sources amazon_it`
 - SKU006 `Scrub Corpo Sale Marino 300ml`:
-  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=scrub+sale+marino+corpo" --sources amazon_it,ebay_it`
+  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=scrub+sale+marino+corpo" --sources amazon_it`
 - SKU007 `Scrub Corpo Zucchero 250ml`:
-  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=scrub+zucchero+corpo" --sources amazon_it,ebay_it`
+  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=scrub+zucchero+corpo" --sources amazon_it`
 - SKU008 `Lozione Corpo Idratante 400ml`:
-  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=lozione+corpo" --sources amazon_it,ebay_it`
+  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=lozione+corpo" --sources amazon_it`
 - SKU009 `Crema Corpo AHA Esfoliante 200ml`:
-  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=crema+corpo+aha" --sources amazon_it,ebay_it`
+  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=crema+corpo+aha" --sources amazon_it`
 - SKU010 `Gel Gambe Leggere 200ml`:
-  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=gel+gambe+leggere" --sources amazon_it,ebay_it`
+  `python italy/scraper_it.py --search-url "https://www.amazon.it/s?k=gel+gambe+leggere" --sources amazon_it`
 
 ## Local output
 - SQLite DB: `data/results.db`
