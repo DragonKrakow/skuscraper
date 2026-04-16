@@ -15,6 +15,11 @@ SCHEMA_FIELDS = [
     "source",
     "market",
     "scraped_at",
+    "asin",
+    "url",
+    "image",
+    "rating",
+    "seller",
 ]
 
 
@@ -37,7 +42,12 @@ def init_db(db_path: str) -> None:
                 currency TEXT,
                 source TEXT,
                 market TEXT,
-                scraped_at TEXT
+                scraped_at TEXT,
+                asin TEXT,
+                url TEXT,
+                image TEXT,
+                rating REAL,
+                seller TEXT
             )
             """
         )
@@ -51,9 +61,9 @@ def save_records_sqlite(db_path: str, records: Iterable[Dict[str, Any]]) -> int:
         conn.executemany(
             """
             INSERT INTO products (
-                ean, product_name, brand, category, price, currency, source, market, scraped_at
+                ean, product_name, brand, category, price, currency, source, market, scraped_at, asin, url, image, rating, seller
             ) VALUES (
-                :ean, :product_name, :brand, :category, :price, :currency, :source, :market, :scraped_at
+                :ean, :product_name, :brand, :category, :price, :currency, :source, :market, :scraped_at, :asin, :url, :image, :rating, :seller
             )
             """,
             normalized,
