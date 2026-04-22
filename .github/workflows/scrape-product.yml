@@ -1,22 +1,32 @@
-name: CI
+name: Scrape product to CSV
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      market:
+        description: "Market to scrape"
+        type: choice
+        options:
+          - IT
+          - PL
+        default: IT
+        required: true
+      query:
+        description: "Product query (EAN 8/13 digits or free text)"
+        type: string
+        required: true
 
 jobs:
-  build:
+  scrape:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -24,9 +34,26 @@ jobs:
           pip install -r requirements.txt
 
       - name: Install Playwright browsers
-        run: python -m playwright install --with-deps chromium
-
-      - name: Run tests
         run: |
-          # Your test command here
-          python -m unittest discover
+          python -m playwright install --with-deps chromium
+
+      - name: Run scrape
+        run: |
+          python scripts/run_scrape.py \
+            --market "${{ inputs.market }}" \
+            --query "${{ inputs.query }}" \
+            --csv outputs/results.csv
+
+      - name: Build artifact name
+        id: artifact_name
+        run: |
+          safe_query=$(echo "${{ inputs.query }}" | tr '[:space:]' '-' | tr -cd '[:alnum:]_.-' | cut -c1-40)
+          if [ -z "$safe_query" ]; then safe_query="query"; fi
+          echo "value=scrape-${{ inputs.market }}-${safe_query}-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload CSV artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.artifact_name.outputs.value }}
+          path: outputs/*.csv
+          if-no-files-found: error
