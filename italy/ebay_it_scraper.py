@@ -50,13 +50,14 @@ class EbayItScraper(ScraperBase):
 
             amount, currency = parse_currency_amount(price_text or "", default_currency="EUR")
             delivery_cost, delivery_currency = parse_delivery_cost(delivery_text or "", default_currency=currency)
+            resolved_currency = delivery_currency if delivery_cost is not None and delivery_currency else currency
             offers.append(
                 Offer(
                     product_name=title,
                     source="eBay.it",
                     link=link,
                     item_price=amount,
-                    currency=delivery_currency or currency,
+                    currency=resolved_currency,
                     delivery_cost=delivery_cost,
                 )
             )
@@ -102,13 +103,14 @@ class EbayItScraper(ScraperBase):
                 shipping_text = shipping_el.inner_text() if shipping_el else ""
                 amount, currency = parse_currency_amount(price_text, default_currency="EUR")
                 delivery_cost, delivery_currency = parse_delivery_cost(shipping_text, default_currency=currency)
+                resolved_currency = delivery_currency if delivery_cost is not None and delivery_currency else currency
                 offers.append(
                     Offer(
                         product_name=title,
                         source="eBay.it",
                         link=link,
                         item_price=amount,
-                        currency=delivery_currency or currency,
+                        currency=resolved_currency,
                         delivery_cost=delivery_cost,
                     )
                 )

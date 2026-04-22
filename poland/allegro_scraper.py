@@ -112,13 +112,14 @@ class AllegroScraper(ScraperBase):
 
                 amount, currency = parse_currency_amount(price_text, default_currency="PLN")
                 delivery_cost, delivery_currency = parse_delivery_cost(combined_text, default_currency=currency)
+                resolved_currency = delivery_currency if delivery_cost is not None and delivery_currency else currency
                 offers.append(
                     Offer(
                         product_name=title,
                         source="Allegro",
                         link=link,
                         item_price=amount,
-                        currency=delivery_currency or currency,
+                        currency=resolved_currency,
                         delivery_cost=delivery_cost,
                     )
                 )

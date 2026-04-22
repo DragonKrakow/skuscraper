@@ -44,8 +44,8 @@ class ScraperBase:
         return {
             "user_agent": self.headers.get("User-Agent"),
             "viewport": {"width": 1366, "height": 900},
-            "locale": "pl-PL",
-            "timezone_id": "Europe/Warsaw",
+            "locale": "en-US",
+            "timezone_id": "UTC",
             "extra_http_headers": {"Accept-Language": self.headers.get("Accept-Language", "en-US,en;q=0.8")},
         }
 
