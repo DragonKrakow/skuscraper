@@ -1,17 +1,14 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
 from typing import Dict, Tuple
 
 from common.http_client import HttpClient, HttpConfig, default_headers
 
 
-@dataclass
 class ScraperBase:
-    env_prefix: str
-
-    def __post_init__(self) -> None:
+    def __init__(self, env_prefix: str) -> None:
+        self.env_prefix = env_prefix
         self.headers = default_headers()
         self.http = HttpClient(config=self._http_config(), headers=self.headers)
 
