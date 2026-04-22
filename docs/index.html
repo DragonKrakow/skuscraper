@@ -134,7 +134,7 @@
 <body>
   <main class="card">
     <h1>Product Search (Italy + Poland)</h1>
-    <p>Use one field for either an EAN code or a product name, then choose market: Poland or Italy.</p>
+    <p>Enter EAN or product name, then run the GitHub Actions workflow manually to generate a downloadable CSV artifact.</p>
 
     <form id="searchForm">
       <label for="query">EAN or product name</label>
@@ -148,13 +148,14 @@
           </select>
         </div>
       </div>
-      <button type="submit">Search</button>
-      <p class="hint">Tip: enter an 8 or 13-digit EAN code, or any text for product name search.</p>
+      <button type="submit">Prepare workflow run</button>
+      <p class="hint">Tip: Pages cannot run scrapers directly. Use this form to prepare inputs, then run the workflow from the Actions tab.</p>
     </form>
 
     <section id="result" class="result" hidden>
       <h2 id="resultTitle"></h2>
       <code id="cliCommand"></code>
+      <p class="hint">After the workflow completes, open the run page and download the CSV from the <strong>Artifacts</strong> section.</p>
       <ul id="links"></ul>
     </section>
   </main>
@@ -204,14 +205,24 @@
       const market = marketInput.value;
       const eanMode = isEanFormat(query);
 
-      resultTitle.textContent = `${eanMode ? 'EAN' : 'Product name'} search for ${marketLabel[market]}`;
-      cliCommand.textContent = eanMode
-        ? (market === 'IT'
-          ? `python italy/scraper_it.py --ean ${query}`
-          : `python poland/scraper_pl.py --ean ${query}`)
-        : 'CLI mode accepts EAN codes. Search by product name first, then scrape with the matched EAN.';
+      resultTitle.textContent = `Run workflow for ${marketLabel[market]} (${eanMode ? 'EAN' : 'product name'} input)`;
+      cliCommand.textContent = `Workflow inputs:\nmarket: ${market}\nquery: ${query}`;
 
       links.innerHTML = '';
+      const workflowLinks = [
+        { label: 'Run "Scrape product to CSV" workflow', url: 'https://github.com/DragonKrakow/skuscraper/actions/workflows/scrape-product.yml' },
+        { label: 'View workflow runs and download artifact', url: 'https://github.com/DragonKrakow/skuscraper/actions/workflows/scrape-product.yml?query=event%3Aworkflow_dispatch' }
+      ];
+      for (const item of workflowLinks) {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = item.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.textContent = item.label;
+        li.appendChild(a);
+        links.appendChild(li);
+      }
       for (const item of getQuickLinks(query, market, eanMode)) {
         const li = document.createElement('li');
         const a = document.createElement('a');
