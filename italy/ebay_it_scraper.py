@@ -15,6 +15,8 @@ except Exception:  # pragma: no cover - optional runtime dependency safety
 
 
 class EbayItScraper(ScraperBase):
+    CARD_SELECTORS = ("li.s-item", "div.s-item__wrapper", "article")
+
     def __init__(self) -> None:
         super().__init__(env_prefix="EBAY_IT")
 
@@ -34,7 +36,7 @@ class EbayItScraper(ScraperBase):
             return []
 
         soup = make_soup(html)
-        cards = stable_nodes(soup, ("li.s-item", "div.s-item__wrapper", "article"))
+        cards = stable_nodes(soup, self.CARD_SELECTORS)
 
         offers: List[Offer] = []
         for card in cards:
@@ -77,7 +79,11 @@ class EbayItScraper(ScraperBase):
             page.goto(self.build_search_url(query), wait_until="domcontentloaded")
             page.wait_for_timeout(1200)
 
-            cards = page.query_selector_all("li.s-item")
+            cards = []
+            for selector in self.CARD_SELECTORS:
+                cards = page.query_selector_all(selector)
+                if cards:
+                    break
             offers: List[Offer] = []
             for card in cards:
                 title_el = card.query_selector(".s-item__title") or card.query_selector("h3")

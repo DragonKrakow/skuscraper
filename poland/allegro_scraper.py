@@ -17,6 +17,8 @@ except Exception:  # pragma: no cover - optional runtime dependency safety
 
 
 class AllegroScraper(ScraperBase):
+    LISTING_URL_TEMPLATE = "https://www.allegro.pl/listing?string={query}"
+
     def __init__(self) -> None:
         super().__init__(env_prefix="ALLEGRO")
 
@@ -61,7 +63,8 @@ class AllegroScraper(ScraperBase):
                 Offer(
                     product_name=item.get("name") or query,
                     source="Allegro",
-                    link=(item.get("url") or "").strip() or f"https://allegro.pl/listing?string={quote_plus(query)}",
+                    link=(item.get("url") or "").strip()
+                    or self.LISTING_URL_TEMPLATE.format(query=quote_plus(query)),
                     item_price=amount,
                     currency=currency,
                     delivery_cost=None,
@@ -80,7 +83,7 @@ class AllegroScraper(ScraperBase):
             browser = playwright.chromium.launch(**launch_options)
             context = browser.new_context(**context_options)
             page = context.new_page()
-            page.goto(f"https://allegro.pl/listing?string={quote_plus(query)}", wait_until="domcontentloaded")
+            page.goto(self.LISTING_URL_TEMPLATE.format(query=quote_plus(query)), wait_until="domcontentloaded")
             page.wait_for_timeout(1500)
 
             card_selector = "article"
