@@ -27,6 +27,20 @@ def test_select_best_candidate_prefers_closest_name():
     assert selected["ean"] == "22222222"
 
 
+def test_select_best_candidate_uses_contains_bonus_and_tie_break():
+    query = "nutella"
+    candidates = [
+        {"ean": "11111111", "product_name": "nutella"},
+        {"ean": "99999999", "product_name": "nutella"},
+        {"ean": "22222222", "product_name": "hazelnut cream"},
+    ]
+
+    selected = select_best_candidate(query, candidates)
+
+    assert selected is not None
+    assert selected["ean"] == "99999999"
+
+
 def test_resolve_ean_skips_search_for_direct_ean(monkeypatch):
     class _DummyClient:
         def search(self, query, page_size=20):  # pragma: no cover - should never run
