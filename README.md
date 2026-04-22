@@ -25,6 +25,11 @@ pip install -r requirements.txt
 cp config.example.env .env
 ```
 
+If you use the new Playwright-based competitors flow:
+```bash
+python -m playwright install chromium
+```
+
 ## CLI usage
 Single EAN (Italy):
 ```bash
@@ -39,6 +44,11 @@ python italy/scraper_it.py --batch /absolute/path/to/eans.txt --csv data/results
 Keyword mode (Italy, merge Amazon + eBay):
 ```bash
 python italy/scraper_it.py --query "crema anticellulite" --sources amazon_it,ebay_it --strategy merge --sort best_match --limit 10
+```
+
+Competitor analysis mode (all sources -> CSV):
+```bash
+python main.py --query "crema anticellulite" --csv data/competitor_prices.csv
 ```
 
 Manual Amazon link mode (Italy, provided search URL):
