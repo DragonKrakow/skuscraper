@@ -21,8 +21,8 @@ def _to_float(value: str) -> Optional[float]:
             normalized = normalized.replace(".", "").replace(",", ".")
         else:
             normalized = normalized.replace(",", "")
-    elif "," in normalized:
-        normalized = normalized.replace(".", "").replace(",", ".")
+    elif "," in normalized and "." not in normalized:
+        normalized = normalized.replace(",", ".")
     try:
         return float(normalized)
     except ValueError:

@@ -90,8 +90,10 @@ class EbayItScraper(ScraperBase):
                 if not title or not link:
                     continue
 
-                price_text = (card.query_selector(".s-item__price") or card).inner_text() or ""
-                shipping_text = (card.query_selector(".s-item__shipping") or card).inner_text() or ""
+                price_el = card.query_selector(".s-item__price")
+                shipping_el = card.query_selector(".s-item__shipping")
+                price_text = price_el.inner_text() if price_el else ""
+                shipping_text = shipping_el.inner_text() if shipping_el else ""
                 amount, currency = parse_currency_amount(price_text, default_currency="EUR")
                 delivery_cost, delivery_currency = parse_delivery_cost(shipping_text, default_currency=currency)
                 offers.append(

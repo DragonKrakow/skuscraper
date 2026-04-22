@@ -51,7 +51,11 @@ class AllegroScraper(ScraperBase):
         offers: List[Offer] = []
         for item in offers_data:
             price = ((item.get("sellingMode") or {}).get("price") or {})
-            amount = float(price["amount"]) if price.get("amount") else None
+            raw_amount = price.get("amount")
+            try:
+                amount = float(raw_amount) if raw_amount else None
+            except (TypeError, ValueError):
+                amount = None
             currency = price.get("currency") or "PLN"
             offers.append(
                 Offer(
