@@ -11,10 +11,24 @@ on:
           - PL
         default: IT
         required: true
-      query:
-        description: "Product query (EAN 8/13 digits or free text)"
-        type: string
+      mode:
+        description: "Scraping mode: 'auto' detects EAN vs keyword, 'ean' forces EAN lookup, 'keyword' forces free-text search, 'hertwill' reads products from csv_path"
+        type: choice
+        options:
+          - auto
+          - ean
+          - keyword
+          - hertwill
+        default: auto
         required: true
+      query:
+        description: "Product query (EAN 8/13 digits or free text) — used for auto/ean/keyword modes"
+        type: string
+        required: false
+      csv_path:
+        description: "Repo-relative path to the hertwill products CSV — required for hertwill mode (e.g. inputs/hertwill/hertwill_skincare_bestsellers.csv)"
+        type: string
+        required: false
 
 jobs:
   scrape:
@@ -39,17 +53,34 @@ jobs:
 
       - name: Run scrape
         run: |
-          python scripts/run_scrape.py \
-            --market "${{ inputs.market }}" \
-            --query "${{ inputs.query }}" \
-            --csv outputs/results.csv
+          MODE="${{ inputs.mode }}"
+          if [ "$MODE" = "hertwill" ]; then
+            python scripts/run_scrape.py \
+              --market "${{ inputs.market }}" \
+              --mode hertwill \
+              --csv-path "${{ inputs.csv_path }}" \
+              --csv outputs/results.csv
+          else
+            python scripts/run_scrape.py \
+              --market "${{ inputs.market }}" \
+              --mode "$MODE" \
+              --query "${{ inputs.query }}" \
+              --csv outputs/results.csv
+          fi
 
       - name: Build artifact name
         id: artifact_name
         run: |
-          safe_query=$(echo "${{ inputs.query }}" | tr '[:space:]' '-' | tr -cd '[:alnum:]_.-' | cut -c1-40)
-          if [ -z "$safe_query" ]; then safe_query="query"; fi
-          echo "value=scrape-${{ inputs.market }}-${safe_query}-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          MODE="${{ inputs.mode }}"
+          if [ "$MODE" = "hertwill" ]; then
+            safe_label=$(basename "${{ inputs.csv_path }}" .csv | tr '[:space:]' '-' | tr -cd '[:alnum:]_.-' | cut -c1-40)
+            if [ -z "$safe_label" ]; then safe_label="hertwill"; fi
+            echo "value=scrape-${{ inputs.market }}-hertwill-${safe_label}-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          else
+            safe_query=$(echo "${{ inputs.query }}" | tr '[:space:]' '-' | tr -cd '[:alnum:]_.-' | cut -c1-40)
+            if [ -z "$safe_query" ]; then safe_query="query"; fi
+            echo "value=scrape-${{ inputs.market }}-${safe_query}-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Upload CSV artifact
         uses: actions/upload-artifact@v4
@@ -57,3 +88,4 @@ jobs:
           name: ${{ steps.artifact_name.outputs.value }}
           path: outputs/*.csv
           if-no-files-found: error
+

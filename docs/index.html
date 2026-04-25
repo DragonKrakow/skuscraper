@@ -135,6 +135,11 @@
   <main class="card">
     <h1>Product Search (Italy + Poland)</h1>
     <p>Enter EAN or product name, then run the GitHub Actions workflow manually to generate a downloadable CSV artifact.</p>
+    <p style="margin-top:.5rem;font-size:.88rem;color:var(--muted)">
+      <strong>New — Hertwill batch mode:</strong> select <em>mode = hertwill</em> in the workflow and set
+      <em>csv_path</em> to a repo-relative path (e.g. <code style="display:inline;padding:.1rem .3rem">inputs/hertwill/hertwill_skincare_bestsellers.csv</code>)
+      to scrape all products in that CSV at once.
+    </p>
 
     <form id="searchForm">
       <label for="query">EAN or product name</label>
